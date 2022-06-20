@@ -113,7 +113,7 @@ def generate_single_grade_report(template_file_path, result_file_name):
         target1.cell(row=row_num,column=4,value=lastname)
         target1.cell(row=row_num,column=5,value=birthday)
         # insert the cell style
-        change_cell_style(target1, row_num, 5)
+        change_cell_style(target1, row_num, 7)
 
         # plus the loop
         row_num += 1
@@ -123,7 +123,7 @@ def generate_single_grade_report(template_file_path, result_file_name):
     # fill in the singature and date of the last page
     while (paging_count < 31):
         # insert the cell style
-        # change_cell_style(target1, row_num)
+        change_cell_style(target1, row_num, 7)
 
         row_num += 1
         paging_count += 1
@@ -182,7 +182,6 @@ def generate_course_grade_report(template_file_path, result_file_name):
             row_num += 1
             page_number += 1
             paging_count = 1
-
         student_no = row["订单号"]
         student_name = row["中文姓名"]
         student_firstname = row["名"]
@@ -196,7 +195,7 @@ def generate_course_grade_report(template_file_path, result_file_name):
         target1.cell(row=row_num,column=5,value=student_lastname)
         target1.cell(row=row_num,column=6,value=dob)
         # insert the cell style
-        change_cell_style(target1, row_num, 6)
+        change_cell_style(target1, row_num, 11)
 
         # plus the loop
         row_num += 1
@@ -206,7 +205,7 @@ def generate_course_grade_report(template_file_path, result_file_name):
     # fill in the singature and date of the last page
     while (paging_count < 16):
         # insert the cell style
-        # change_cell_style(target1, row_num)
+        change_cell_style(target1, row_num, 11)
 
         row_num += 1
         paging_count += 1
@@ -256,7 +255,7 @@ def generate_attendance(template_file_path, result_file_name):
         target1.cell(row=row_num,column=2,value=student_cn_name)
         target1.cell(row=row_num,column=3,value=student_eng_name)
         # insert the cell style
-        change_cell_style(target1, row_num, 3)
+        change_cell_style(target1, row_num, 23)
         # plus the loop
         row_num += 1
         student_num += 1
@@ -327,20 +326,66 @@ def generate_roster(template_file_path, result_file_name):
     workbook.save(filename = result_file_name)
 
 
+def info_confirm(template_file_path, result_file_name):
+    '''
+    Generate the attendence
+    @param template_file_path: file path of template
+    @param result_file_name: result file name
+    '''
+    global student_df
+    '''get the template file'''
+    workbook = load_workbook(template_file_path)
+    template = workbook["学生签字确认表"]
+    target1 = workbook.copy_worksheet(template)
+
+    '''generate the grade report'''
+    # the total number of student
+    student_num = 1
+    # the column number
+    row_num = 5
+    # cell style
+    side = Side("thin")
+    # search all students then insert their information
+    for index, row in student_df.iterrows():
+        student_cn_name = row["中文姓名"]
+        student_firstname = row["名"]
+        student_lastname = row["姓"]
+        student_gender = gender_transfer(row["性别"])
+        student_dob = row["出生日期"]
+
+        # insert the informations
+        target1.cell(row=row_num,column=1,value=student_num)
+        target1.cell(row=row_num,column=2,value=student_cn_name)
+        target1.cell(row=row_num,column=3,value=student_firstname)
+        target1.cell(row=row_num,column=4,value=student_lastname)
+        target1.cell(row=row_num,column=5,value=student_gender)
+        target1.cell(row=row_num,column=6,value=student_dob)
+        # insert the cell style
+        change_cell_style(target1, row_num, 7)
+        # plus the loop
+        row_num += 1
+        student_num += 1
+
+    # save the file
+    workbook.save(filename = result_file_name)
+
+
+
 def generate_all():
     '''
     The main function to generate all excels
     '''
     # read file info
-    student_info_reader("BU263 风险管理和衍生品-20220619151404.xls")
-    # single grade report
-    generate_single_grade_report("2022 July_SJTU Single Grade Report.xlsx", "Test_Single_Report.xlsx")
-    # course grade report
-    generate_course_grade_report("2022 July_SJTU Course Grade Report.xlsx", "Test_Course_Report.xlsx")
-    # attendence
-    generate_attendance("Attendence_Temp.xlsx", "Test_Attendence.xlsx")
-    # roster
-    generate_roster("Roster_Temp.xlsx", "Test_Roster.xlsx")
+    # student_info_reader("BU263 风险管理和衍生品-20220619151404.xls")
+    # # single grade report
+    # generate_single_grade_report("2022 July_SJTU Single Grade Report.xlsx", "Test_Single_Report.xlsx")
+    # # course grade report
+    # generate_course_grade_report("2022 July_SJTU Course Grade Report.xlsx", "Test_Course_Report.xlsx")
+    # # attendence
+    # generate_attendance("Attendence_Temp.xlsx", "Test_Attendence.xlsx")
+    # # roster
+    # generate_roster("Roster_Temp.xlsx", "Test_Roster.xlsx")
+    # info_confirm()
  
 
 def loadInfo(show_entry):
@@ -385,34 +430,37 @@ if __name__ == '__main__':
     root.title("Student List Generator")
 
     en1=Entry(root)
-    en1.grid(row=0, column=1, columnspan=2)
+    en1.grid(row=0, column=1, columnspan=3)
     la1=Label(root, text="已选择的学生信息文件: ")
     la1.grid(row=0, column=0)   
     but1=Button(root, text="选择学生信息文件", command=lambda : loadInfo(en1))
-    but1.grid(row=0, column=3)
+    but1.grid(row=0, column=4)
     
     la2=Label(root,text="已选择的Template文件: ")
     la2.grid(row=1, column=0)
     en2=Entry(root)
-    en2.grid(row=1,column=1,columnspan=2)
+    en2.grid(row=1,column=1,columnspan=3)
     but2=Button(root, text="选择Template文件", command=lambda : loadTemp(en2))
-    but2.grid(row=1, column=3)
+    but2.grid(row=1, column=4)
 
     la3=Label(root,text="目标文件路径：")
     la3.grid(row=2, column=0)
     en3=Entry(root)
-    en3.grid(row=2,column=1,columnspan=2)
-    but3=Button(root, text="选择目标文件路径", command=lambda : bindTarget(en3))
-    but3.grid(row=2, column=3)
+    en3.grid(row=2,column=1,columnspan=3)
+    but2=Button(root, text="选择目标文件路径", command=lambda : bindTarget(en3))
+    but2.grid(row=2, column=4)
     
 
-    but2=tk.Button(root, text=' 生成 "花名册" ', command=lambda : generate_roster(temp_path, target_path + "/自动生成_花名册.xlsx"))
-    but2.grid(row=3,column=0)
+    but6=tk.Button(root, text=' 生成 "花名册" ', command=lambda : generate_roster(temp_path, target_path + "/自动生成_花名册.xlsx"))
+    but6.grid(row=3,column=0)
     but3=Button(root,text=' 生成 "考勤表" ', command=lambda : generate_attendance(temp_path, target_path + "/自动生成_考勤表.xlsx"))
     but3.grid(row=3,column=1)
     but4=Button(root,text=' 生成 "Course Grade Report" ', command=lambda : generate_course_grade_report(temp_path, target_path + "/自动生成_Course_Grade_Report.xlsx"))
     but4.grid(row=3,column=2)
     but5=Button(root,text=' 生成 "单次Grade Report" ', command=lambda : generate_single_grade_report(temp_path, target_path + "/自动生成_单次Grade_Report.xlsx"))
     but5.grid(row=3,column=3)
+    but7=tk.Button(root, text=' 生成 "学生信息确认表" ', command=lambda : info_confirm(temp_path, target_path + "/自动生成_学生信息确认表.xlsx"))
+    but7.grid(row=3,column=4)
+
 
     root.mainloop()
